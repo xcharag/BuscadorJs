@@ -9,6 +9,8 @@ const puertas = document.querySelector("#puertas");
 const transmision = document.querySelector("#transmision");
 const color = document.querySelector("#color");
 
+const filtros = document.querySelectorAll("#buscador select");
+
 const datosBusqueda ={
     marca:'',
     year : '',
@@ -22,6 +24,7 @@ const datosBusqueda ={
 document.addEventListener('DOMContentLoaded',()=>{
     mostrarAutos(autos);
     llenarYearSelect();
+    console.log(filtros);
 })
 
 marca.addEventListener('change',e=>{
@@ -29,8 +32,13 @@ marca.addEventListener('change',e=>{
     filtrarAuto();
 })
 
+precioMin.addEventListener('change',e=>{
+    datosBusqueda.precioMin = e.target.value;
+    filtrarAuto();
+})
+
 function filtrarAuto(){
-    const resultado = autos.filter(filtrarMarca)
+    const resultado = autos.filter(filtrarMarca).filter(filtrarPrecioMin); //Vamos concatenando los filtros y vamos creando las funciones exactamente igual cambiando sus variables
     limpiarHTML();
     mostrarAutos(resultado);
     console.log(resultado);
@@ -49,16 +57,30 @@ function filtrarMarca(auto){
     } return auto;
 }
 
+function filtrarPrecioMin(auto){
+    const {precioMin} = datosBusqueda;
+    if (precioMin){
+        return auto.precio >= parseInt(precioMin);
+    } return auto;
+}
+
 function mostrarAutos(autos){
-    autos.forEach(auto=>{
-        const {marca,modelo,year,puertas,transmision,color,precio} = auto;
-        const autoHTML = document.createElement('p');
-        autoHTML.textContent = `
+    if (autos){
+        autos.forEach(auto=>{
+            const {marca,modelo,year,puertas,transmision,color,precio} = auto;
+            const autoHTML = document.createElement('p');
+            autoHTML.textContent = `
             ${marca} ${modelo} -${year} -${puertas} puertas - Transmision:${transmision} -Precio:${precio}Bs -Color:${color}
         `;
 
-        resultado.appendChild(autoHTML);
-    })
+            resultado.appendChild(autoHTML);
+        })
+    } else {
+        const sinCoincidencias = document.createElement('p');
+        sinCoincidencias.textContent = 'Hola';
+        sinCoincidencias.style.color = 'red';
+        resultado.appendChild(sinCoincidencias);
+    }
 }
 
 function llenarYearSelect(){
